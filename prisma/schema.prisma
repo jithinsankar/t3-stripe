@@ -55,6 +55,7 @@ model User {
     image                    String?
     accounts                 Account[]
     sessions                 Session[]
+    ProductDatas             ProductData[]
     stripeCustomerId         String? // link to Stripe customer object in Stripe's system
     stripeSubscriptionId     String? // link to Stripe subscription object for user in Stripe's system
     stripeSubscriptionStatus StripeSubscriptionStatus? // status of user's subscription to determine access to services
@@ -90,4 +91,12 @@ model StripeEvent {
     created          DateTime
     livemode         Boolean
     pending_webhooks Int
+}
+
+model ProductData {
+    id          String  @id @default(cuid())
+    text_input  String
+    text_output String
+    User        User?   @relation(fields: [userId], references: [id])
+    userId      String?
 }

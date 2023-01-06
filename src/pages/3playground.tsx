@@ -3,7 +3,6 @@ import Link from "next/link";
 import { unstable_getServerSession } from "next-auth";
 import { signOut } from "next-auth/react";
 import Head from "next/head";
-import { useRouter } from "next/router";
 import { api } from "../utils/api";
 import { authOptions } from "./api/auth/[...nextauth]";
 
@@ -20,48 +19,10 @@ const SignoutButton = () => {
   );
 };
 
-const UpgradeButton = () => {
-  const { mutateAsync: createCheckoutSession } =
-    api.stripe.createCheckoutSession.useMutation();
-  const { push } = useRouter();
-  return (
-    <button
-      className="w-fit cursor-pointer rounded-md bg-blue-500 px-5 py-2 text-lg font-semibold text-white shadow-sm duration-150 hover:bg-blue-600"
-      onClick={async () => {
-        const { checkoutUrl } = await createCheckoutSession();
-        if (checkoutUrl) {
-          push(checkoutUrl);
-        }
-      }}
-    >
-      Upgrade account
-    </button>
-  );
-};
-
-const ManageBillingButton = () => {
-  const { mutateAsync: createBillingPortalSession } =
-    api.stripe.createBillingPortalSession.useMutation();
-  const { push } = useRouter();
-  return (
-    <button
-      className="w-fit cursor-pointer rounded-md bg-blue-500 px-5 py-2 text-lg font-semibold text-white shadow-sm duration-150 hover:bg-blue-600"
-      onClick={async () => {
-        const { billingPortalUrl } = await createBillingPortalSession();
-        if (billingPortalUrl) {
-          push(billingPortalUrl);
-        }
-      }}
-    >
-      Manage subscription and billing
-    </button>
-  );
-};
-
-const Dashboard: NextPage = () => {
+const Playground: NextPage = () => {
   const { data: subscriptionStatus, isLoading } =
     api.user.subscriptionStatus.useQuery();
-  const hello = api.example.hello.useQuery({ text: "from tRPC" });
+
   return (
     <>
       <Head>
@@ -71,7 +32,7 @@ const Dashboard: NextPage = () => {
       </Head>
       <main className="container mx-auto flex min-h-screen flex-col items-center justify-center p-4">
         <h1 className="text-5xl font-extrabold leading-normal text-gray-700">
-          T3 <span className="text-[#5433FF]">Stripe</span> Dashboard
+          T3 <span className="text-[#5433FF]">Stripe</span> Playground
         </h1>
         <p className="text-2xl text-gray-700">Actions:</p>
         <div className="mt-3 flex flex-col items-center justify-center gap-4">
@@ -81,24 +42,21 @@ const Dashboard: NextPage = () => {
               <p className="text-xl text-gray-700">
                 Your subscription is {subscriptionStatus}.
               </p>
-              <ManageBillingButton />
-            </>
-          )}
-          {!isLoading && subscriptionStatus != "active" && (
-            <>
-              <p className="text-xl text-gray-700">You are not subscribed!!!</p>
-              <UpgradeButton />
-            </>
-          )}
-          {!isLoading && subscriptionStatus === "active" && (
-            <>
-              <Link href="/playground" className="text-xl text-gray-700">
-                Playground
-              </Link>
             </>
           )}
 
-          {hello.data ? hello.data.greeting : "Loading tRPC query..."}
+          {!isLoading && subscriptionStatus != "active" && (
+            <>
+              <p className="text-xl text-gray-700">You are not subscribed!!!</p>
+            </>
+          )}
+
+          <Link href="/dashboard" className="text-xl text-gray-700">
+            Dashboard
+          </Link>
+          <Link href="/" className="text-xl text-gray-700">
+            Landing Page
+          </Link>
         </div>
       </main>
     </>
@@ -128,4 +86,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   };
 };
 
-export default Dashboard;
+export default Playground;
